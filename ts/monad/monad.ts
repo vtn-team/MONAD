@@ -8,14 +8,17 @@ import { getNode } from "./neo4jCache"
 //NOTE: neo4jのほうにだけデータがあるという状態は想定しない
 export async function openPage(URI: string) {
 	//neo4jを検索
-	let result = await getNode(DataType.PAGE, URI);
+	let result:any = await getNode(DataType.PAGE, URI);
+	
+	//あればキャッシュを返す
+	if(result) return result;
 	
 	//なかったらnotionを検索
 	if(!result) {
 		let page = await getNotionData(DataType.PAGE, URI);
 		if(page) {
 			console.log(page);
-			let words = await getRelatedNotionData(DataType.WORD, "RefID", "number", { "equals" : page.ID }, true);
+			let words = await getRelatedNotionData(DataType.WORD, "Relations", "relation", { "contains" : page.id }, true);
 			let notes = await getChildNotionData(page.Child);
 			
 			result = {
@@ -28,7 +31,7 @@ export async function openPage(URI: string) {
 	
 	//なかったら終了
 	if(!result) {
-		return result;
+		return null;
 	}
 	
 	//neo4jに登録する

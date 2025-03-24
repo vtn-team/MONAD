@@ -20,8 +20,8 @@ export async function test(req: any,res: any,route: any)
 	
 	if(page) {
 	 	let md = markdown();
-		page.Page.Contents = convertToMarkdown(page.Page.Contents);
-	 	page.Page.Contents = encodeURIComponent(md.render(page.Page.Contents));
+		//page.Page.Contents = convertToMarkdown(page.Page.Contents);
+	 	//page.Page.Contents = encodeURIComponent(md.render(page.Page.Contents));
 		return {
 			Status: 200,
 			Page: page,

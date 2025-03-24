@@ -21,7 +21,7 @@ export async function getNotionData(type: DataType, dataKey: string) {
 	return result;
 }
 
-//対象のNotionのデータを返す
+//対象のNotionのリレーションデータを返す
 export async function getRelatedNotionData(type: DataType, fkeyName: string, fKeyType: string, fKeyValue: any, useContents: boolean) {
 	let result = null;
 	
@@ -61,18 +61,19 @@ export async function getChildNotionData(childIds: Array<string>) {
 	
 	console.log("getChildNotionData");
 	
-	try {
-		for(let id of childIds) {
-			let prop:any = await getDatabase(id);
+	for (let id of childIds) {
+		try {
+			let prop: any = await getPageProperties(id);
+			prop = prettyPageProperty(prop);
 			let contents = await getContents(id);
-			if(!contents) continue;
-			if(contents.length == 0) continue;
-			
+			if (!contents) continue;
+			if (contents.length == 0) continue;
+
 			prop.Contents = contents;
 			result.push(prop);
+		} catch (ex) {
+			console.log(ex);
 		}
-	}catch(ex){
-		console.log(ex);
 	}
 	
 	return result;

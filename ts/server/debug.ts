@@ -9,7 +9,7 @@ export async function index(req: any,res: any,route: any)
 
 export async function web(req: any,res: any,route: any)
 {
-	const text = await fs.readFile(__dirname+"/../../../Web/index.html");
+	const text = await fs.readFile(__dirname+"/../../view/index.html");
 	return {
 		statusCode: 200,
 		type: 'text/html',
@@ -19,7 +19,7 @@ export async function web(req: any,res: any,route: any)
 
 export async function webDev(req: any,res: any,route: any)
 {
-	const text = await fs.readFile(__dirname+"/../../../Web/debug.html");
+	const text = await fs.readFile(__dirname+"/../../view/debug.html");
 	return {
 		statusCode: 200,
 		type: 'text/html',
@@ -29,7 +29,7 @@ export async function webDev(req: any,res: any,route: any)
 
 export async function manifest(req: any,res: any,route: any)
 {
-	const text = await fs.readFile(__dirname+"/../../../Web/manifest.json");
+	const text = await fs.readFile(__dirname+"/../../view/manifest.json");
 	return {
 		statusCode: 200,
 		type: 'application/json',
@@ -39,7 +39,7 @@ export async function manifest(req: any,res: any,route: any)
 
 export async function serviceworker(req: any,res: any,route: any)
 {
-	const text = await fs.readFile(__dirname+"/../../../Web/serviceworker.js");
+	const text = await fs.readFile(__dirname+"/../../view/serviceworker.js");
 	return {
 		statusCode: 200,
 		type: 'text/javascript',
@@ -49,7 +49,7 @@ export async function serviceworker(req: any,res: any,route: any)
 
 export async function animejs(req: any,res: any,route: any)
 {
-	const text = await fs.readFile(__dirname+"/../../../Web/anime.min.js");
+	const text = await fs.readFile(__dirname+"/../../view/anime.min.js");
 	return {
 		statusCode: 200,
 		type: 'text/javascript',
@@ -59,7 +59,7 @@ export async function animejs(req: any,res: any,route: any)
 
 export async function bg(req: any,res: any,route: any)
 {
-	const image = await fs.readFile(__dirname+"/../../../Web/bg.jpg");
+	const image = await fs.readFile(__dirname+"/../../view/bg.jpg");
 	return {
 		statusCode: 200,
 		type: 'image/jpeg',

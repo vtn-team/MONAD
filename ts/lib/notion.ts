@@ -55,7 +55,9 @@ const getText = (richTextArray:any) => {
 
 export function prettyPageProperty(page: any)
 {
-    let json: any = {}
+    let json: any = {
+        id: page.id
+    }
     const prop = page.properties;
     for(let key in prop) {
       let d = page.properties[key][page.properties[key].type];
@@ -344,7 +346,8 @@ async function getNotionDatabase(dbId: string, filter: any) {
   const pages = []
   let cursor = undefined;
   let next_cursor = undefined;
-  
+  dbId = dbId.replace(/-/g, "");
+
   while (true) {
     let nc:any = undefined;
     if(filter){
@@ -355,7 +358,7 @@ async function getNotionDatabase(dbId: string, filter: any) {
       });
       pages.push(...results);
       nc = next_cursor;
-    }else{
+    } else {
       const { results, next_cursor:any } = await notion.databases.query({
         database_id: dbId,
         start_cursor: cursor
@@ -442,7 +445,7 @@ export async function searchDocs(query: string, filter: any)
 	return pages;
 }
 
-export async function getDatabase(dbId: string, filter: any)
+export async function getDatabase(dbId: string, filter: any = null)
 {
 	let pages = await getNotionDatabase(dbId, filter);
 	return pages;

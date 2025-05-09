@@ -19,6 +19,12 @@ exports.Routes = {
 				}
 			}
 		},
+		"/classroom" : {
+			"/user" : {
+				"/" : "classroom#main#    授業ページ",
+				"/create" : "classroom#usercreate#    授業ページ",
+			}
+		},
 		"/search" : {
 			"@word%s" : {
 				"@category%s" : {

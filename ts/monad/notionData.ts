@@ -109,15 +109,67 @@ export async function createNotionData(type: DataType, data: any) {
 	return result;
 }
 
-export async function updateData(uuid: string, data: any) {
+export async function updateData(type: DataType, pageId: string, data: any) {
 	let result = null;
 	
-	console.log("createExtendInfo");
+	console.log("updateData");
 	
 	try {
-		//tbd
-		//console.log(page);
-		//result = prettyPage(page);
+		let info = TableInfo[type];
+		
+		let props: any = {};
+		for(let d of info.Scheme) {
+			if (data[d.Name] !== undefined) {
+				props[d.Name] = {};
+				props[d.Name][d.Style] = [{}];
+				props[d.Name][d.Style][0][d.Type] = { "content" : data[d.Name] };
+			}
+		}
+		
+		// Use the createPage function pattern but for updating
+		let updateData = {
+			page_id: pageId,
+			properties: props
+		};
+		
+		// We need to add a function to notion.ts to handle page updates
+		// For now, we'll use a direct import of the Notion client
+		const { Client } = require("@notionhq/client");
+		const { COCOIRU_NOTION_TOKEN } = require("./../config/config");
+		const notionClient = new Client({ auth: COCOIRU_NOTION_TOKEN });
+		
+		let page:any = await notionClient.pages.update(updateData);
+		
+		console.log(page);
+		result = prettyPageProperty(page);
+	}catch(ex){
+		console.log(ex);
+	}
+	
+	return result;
+}
+
+export async function deleteData(type: DataType, pageId: string) {
+	let result = false;
+	
+	console.log("deleteData");
+	
+	try {
+		// Notion API doesn't have a direct delete method, but we can archive a page
+		// which effectively removes it from view in the Notion UI
+		
+		// We need to add a function to notion.ts to handle page archiving
+		// For now, we'll use a direct import of the Notion client
+		const { Client } = require("@notionhq/client");
+		const { COCOIRU_NOTION_TOKEN } = require("./../config/config");
+		const notionClient = new Client({ auth: COCOIRU_NOTION_TOKEN });
+		
+		await notionClient.pages.update({
+			page_id: pageId,
+			archived: true
+		});
+		
+		result = true;
 	}catch(ex){
 		console.log(ex);
 	}

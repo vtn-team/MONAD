@@ -98,6 +98,123 @@ export async function createRelationship(baseId: string, targetId: string, relat
 	}
 }
 
+export async function updateNode(typeName: string, nodeId: string, data: any) {
+	const session = driver.session();
+
+	try {
+		// Remove Neo4jID from data to prevent overwriting it
+		const updateData = { ...data };
+		delete updateData.Neo4jID;
+		
+		// Update the node properties
+		const result = await session.run(
+			`
+			MATCH (n:${typeName} { Neo4jID: $nodeId })
+			SET n += $updateData
+			RETURN n
+			`,
+			{ nodeId, updateData }
+		);
+		
+		if (result.records.length === 0) {
+			console.log(`Node with ID ${nodeId} not found.`);
+			return null;
+		}
+		
+		console.log(`Node with ID ${nodeId} has been updated.`);
+		return result.records[0].get('n').properties;
+	} catch (error) {
+		console.error('Error updating node:', error);
+	} finally {
+		await session.close();
+	}
+	
+	return null;
+}
+
+export async function deleteNode(typeName: string, nodeId: string) {
+	const session = driver.session();
+
+	try {
+		// First, delete all relationships connected to this node
+		await session.run(
+			`
+			MATCH (n:${typeName} { Neo4jID: $nodeId })-[r]-()
+			DELETE r
+			`,
+			{ nodeId }
+		);
+		
+		// Then delete the node itself
+		const result = await session.run(
+			`
+			MATCH (n:${typeName} { Neo4jID: $nodeId })
+			DELETE n
+			RETURN count(n) as deletedCount
+			`,
+			{ nodeId }
+		);
+		
+		const deletedCount = result.records[0].get('deletedCount').toNumber();
+		if (deletedCount === 0) {
+			console.log(`Node with ID ${nodeId} not found.`);
+			return false;
+		}
+		
+		console.log(`Node with ID ${nodeId} has been deleted.`);
+		return true;
+	} catch (error) {
+		console.error('Error deleting node:', error);
+	} finally {
+		await session.close();
+	}
+	
+	return false;
+}
+
+export async function deleteRelationship(baseId: string, targetId: string, relation?: string) {
+	const session = driver.session();
+	try {
+		let query;
+		let params;
+		
+		if (relation) {
+			// Delete specific relationship type
+			query = `
+				MATCH (a { Neo4jID: $baseId })-[r:RELEVANCY { relation: $relation }]->(b { Neo4jID: $targetId })
+				DELETE r
+				RETURN count(r) as deletedCount
+			`;
+			params = { baseId, targetId, relation };
+		} else {
+			// Delete any relationship between the nodes
+			query = `
+				MATCH (a { Neo4jID: $baseId })-[r:RELEVANCY]->(b { Neo4jID: $targetId })
+				DELETE r
+				RETURN count(r) as deletedCount
+			`;
+			params = { baseId, targetId };
+		}
+		
+		const result = await session.run(query, params);
+		const deletedCount = result.records[0].get('deletedCount').toNumber();
+		
+		if (deletedCount === 0) {
+			console.log(`No relationship found between "${baseId}" and "${targetId}"`);
+			return false;
+		}
+		
+		console.log(`Relationship deleted between "${baseId}" and "${targetId}"`);
+		return true;
+	} catch (error) {
+		console.error('Error deleting relationship:', error);
+	} finally {
+		await session.close();
+	}
+	
+	return false;
+}
+
 
 // キーワードの取得
 export async function getKeywords(keyword: string, category: string) {

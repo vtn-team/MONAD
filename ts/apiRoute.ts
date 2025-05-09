@@ -47,6 +47,20 @@ exports.Routes = {
 		"/login" : "user#login",
 		"/callback" : "auth#googleAuth",
 		"/maintain" : "vc#maintenance#             メンテナンス",
+		"/monad" : {
+			"/page" : {
+				"/update" : "monad#updatePageEndpoint#Update a page",
+				"/delete" : "monad#deletePageEndpoint#Delete a page"
+			},
+			"/word" : {
+				"/update" : "monad#updateWordEndpoint#Update a word",
+				"/delete" : "monad#deleteWordEndpoint#Delete a word"
+			},
+			"/note" : {
+				"/update" : "monad#updateNoteEndpoint#Update a note",
+				"/delete" : "monad#deleteNoteEndpoint#Delete a note"
+			}
+		},
 		"/tools" : {
 			"/ephemeralkey" : "ai#ephemeralkey#     エフェメラルキーを取得"
 		},
